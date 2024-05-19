@@ -1,136 +1,123 @@
-# Jenkins-Zero-To-Hero
 
-Are you looking forward to learn Jenkins right from Zero(installation) to Hero(Build end to end pipelines)? then you are at the right place. 
+# DevOps Project README
 
-## Installation on EC2 Instance
+This project demonstrates the setup and deployment of a CI/CD pipeline using Jenkins, SonarQube, and Argo CD on AWS infrastructure. The pipeline includes code quality checks, Docker image creation, and deployment of a Java Maven application to an EKS cluster.
 
-YouTube Video ->
-https://www.youtube.com/watch?v=zZfhAXfBvVA&list=RDCMUCnnQ3ybuyFdzvgv2Ky5jnAA&index=1
+## Table of Contents
 
+1. [Project Overview](#project-overview)
+2. [Architecture](#architecture)
+3. [Prerequisites](#prerequisites)
+4. [Setup Instructions](#setup-instructions)
+   - [Setting up Jenkins](#setting-up-jenkins)
+   - [Setting up SonarQube](#setting-up-sonarqube)
+   - [Setting up EKS Cluster](#setting-up-eks-cluster)
+   - [Setting up Argo CD](#setting-up-argo-cd)
+5. [Pipeline Workflow](#pipeline-workflow)
+6. [Deployment](#deployment)
+7. [Conclusion](#conclusion)
 
-![Screenshot 2023-02-01 at 5 46 14 PM](https://user-images.githubusercontent.com/43399466/216040281-6c8b89c3-8c22-4620-ad1c-8edd78eb31ae.png)
+## Project Overview
 
-Install Jenkins, configure Docker as agent, set up cicd, deploy applications to k8s and much more.
+This project involves setting up a CI/CD pipeline to automate the process of building, testing, and deploying a Java Maven application. The key components used in this project are:
 
-## AWS EC2 Instance
+- Jenkins for continuous integration
+- SonarQube for code quality analysis
+- Docker for containerization
+- Docker Hub for image repository
+- EKS (Elastic Kubernetes Service) for container orchestration
+- Argo CD for continuous deployment
 
-- Go to AWS Console
-- Instances(running)
-- Launch instances
+## Architecture
 
-<img width="994" alt="Screenshot 2023-02-01 at 12 37 45 PM" src="https://user-images.githubusercontent.com/43399466/215974891-196abfe9-ace0-407b-abd2-adcffe218e3f.png">
+![Architecture Diagram](path/to/architecture-diagram.png)
 
-### Install Jenkins.
+## Prerequisites
 
-Pre-Requisites:
- - Java (JDK)
+Before you begin, ensure you have the following:
 
-### Run the below commands to install Java and Jenkins
+- AWS account with necessary permissions
+- AWS CLI configured
+- Kubernetes CLI (kubectl) installed
+- Docker installed
+- Jenkins, SonarQube, and Argo CD instances set up on AWS EC2
 
-Install Java
+## Setup Instructions
 
-```
-sudo apt update
-sudo apt install openjdk-11-jre
-```
+### Setting up Jenkins
 
-Verify Java is Installed
+1. **Launch an EC2 Instance**: 
+   - Use an Amazon Linux 2 AMI.
+   - Configure security groups to allow HTTP, HTTPS, and a custom TCP port for Jenkins.
 
-```
-java -version
-```
+2. **Install Jenkins**: 
+   - SSH into the EC2 instance.
+   - Install Jenkins and Java, download Jenkins repository, import the Jenkins key, install Jenkins, and start the Jenkins service.
 
-Now, you can proceed with installing Jenkins
+3. **Configure Jenkins**:
+   - Access Jenkins through its web interface and complete the setup wizard.
 
-```
-curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt-get update
-sudo apt-get install jenkins
-```
+### Setting up SonarQube
 
-**Note: ** By default, Jenkins will not be accessible to the external world due to the inbound traffic restriction by AWS. Open port 8080 in the inbound traffic rules as show below.
+1. **Launch an EC2 Instance**:
+   - Use an Amazon Linux 2 AMI.
+   - Configure security groups to allow HTTP, HTTPS, and a custom TCP port for SonarQube.
 
-- EC2 > Instances > Click on <Instance-ID>
-- In the bottom tabs -> Click on Security
-- Security groups
-- Add inbound traffic rules as shown in the image (you can just allow TCP 8080 as well, in my case, I allowed `All traffic`).
+2. **Install SonarQube**:
+   - SSH into the EC2 instance.
+   - Install Java and SonarQube, unzip SonarQube, and set appropriate permissions.
 
-<img width="1187" alt="Screenshot 2023-02-01 at 12 42 01 PM" src="https://user-images.githubusercontent.com/43399466/215975712-2fc569cb-9d76-49b4-9345-d8b62187aa22.png">
+3. **Start SonarQube**:
+   - Run SonarQube.
 
+### Setting up EKS Cluster
 
-### Login to Jenkins using the below URL:
+1. **Create an EKS Cluster**:
+   - Use the AWS Management Console or AWS CLI to create an EKS cluster.
+   - Configure kubectl to interact with the new EKS cluster.
 
-http://<ec2-instance-public-ip-address>:8080    [You can get the ec2-instance-public-ip-address from your AWS EC2 console page]
+2. **Create a Node Group**:
+   - Ensure the EKS cluster has at least two nodes.
 
-Note: If you are not interested in allowing `All Traffic` to your EC2 instance
-      1. Delete the inbound traffic rule for your instance
-      2. Edit the inbound traffic rule to only allow custom TCP port `8080`
-  
-After you login to Jenkins, 
-      - Run the command to copy the Jenkins Admin Password - `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
-      - Enter the Administrator password
-      
-<img width="1291" alt="Screenshot 2023-02-01 at 10 56 25 AM" src="https://user-images.githubusercontent.com/43399466/215959008-3ebca431-1f14-4d81-9f12-6bb232bfbee3.png">
+### Setting up Argo CD
 
-### Click on Install suggested plugins
+1. **Deploy Argo CD**:
+   - Deploy Argo CD in the EKS cluster using the provided YAML manifests.
 
-<img width="1291" alt="Screenshot 2023-02-01 at 10 58 40 AM" src="https://user-images.githubusercontent.com/43399466/215959294-047eadef-7e64-4795-bd3b-b1efb0375988.png">
+2. **Access Argo CD**:
+   - Access the Argo CD server UI using port-forwarding and login to the Argo CD UI.
 
-Wait for the Jenkins to Install suggested plugins
+## Pipeline Workflow
 
-<img width="1291" alt="Screenshot 2023-02-01 at 10 59 31 AM" src="https://user-images.githubusercontent.com/43399466/215959398-344b5721-28ec-47a5-8908-b698e435608d.png">
+1. **Run Jenkins Pipeline in Docker Container**:
+   - Configure Jenkins to use a Docker container as an agent.
 
-Create First Admin User or Skip the step [If you want to use this Jenkins instance for future use-cases as well, better to create admin user]
+2. **Code Quality Check with SonarQube**:
+   - Integrate SonarQube into the Jenkins pipeline for code quality analysis.
 
-<img width="990" alt="Screenshot 2023-02-01 at 11 02 09 AM" src="https://user-images.githubusercontent.com/43399466/215959757-403246c8-e739-4103-9265-6bdab418013e.png">
+3. **Build Application and Docker Image**:
+   - Build the application using the Dockerfile and create a Docker image.
 
-Jenkins Installation is Successful. You can now starting using the Jenkins 
+4. **Push Docker Image to Docker Hub**:
+   - Push the newly built Docker image to Docker Hub.
 
-<img width="990" alt="Screenshot 2023-02-01 at 11 14 13 AM" src="https://user-images.githubusercontent.com/43399466/215961440-3f13f82b-61a2-4117-88bc-0da265a67fa7.png">
+5. **Update Deployment File and Push to GitHub**:
+   - Edit the deployment file with the new image tag and push it to the GitHub repository.
 
-## Install the Docker Pipeline plugin in Jenkins:
+6. **Deploy with Argo CD**:
+   - Argo CD syncs with the GitHub repository and deploys the updated application to the EKS cluster.
 
-   - Log in to Jenkins.
-   - Go to Manage Jenkins > Manage Plugins.
-   - In the Available tab, search for "Docker Pipeline".
-   - Select the plugin and click the Install button.
-   - Restart Jenkins after the plugin is installed.
-   
-<img width="1392" alt="Screenshot 2023-02-01 at 12 17 02 PM" src="https://user-images.githubusercontent.com/43399466/215973898-7c366525-15db-4876-bd71-49522ecb267d.png">
+## Deployment
 
-Wait for the Jenkins to be restarted.
+Follow the pipeline steps to ensure the application is built, tested, and deployed seamlessly:
 
+1. Trigger the Jenkins Pipeline.
+2. Monitor Code Quality Analysis in SonarQube.
+3. Check Docker Image in Docker Hub.
+4. Verify Deployment in Argo CD.
 
-## Docker Slave Configuration
+## Conclusion
 
-Run the below command to Install Docker
+This README provides a comprehensive guide to setting up a CI/CD pipeline using Jenkins, SonarQube, and Argo CD on AWS infrastructure. The pipeline ensures code quality, automates Docker image creation, and manages the deployment of a Java Maven application on an EKS cluster.
 
-```
-sudo apt update
-sudo apt install docker.io
-```
- 
-### Grant Jenkins user and Ubuntu user permission to docker deamon.
-
-```
-sudo su - 
-usermod -aG docker jenkins
-usermod -aG docker ubuntu
-systemctl restart docker
-```
-
-Once you are done with the above steps, it is better to restart Jenkins.
-
-```
-http://<ec2-instance-public-ip>:8080/restart
-```
-
-The docker agent configuration is now successful.
-
-
-
-
+For any issues or further assistance, please refer to the respective documentation of Jenkins, SonarQube, Docker, and Argo CD.
